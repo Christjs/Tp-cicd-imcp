@@ -25,8 +25,7 @@ pipeline {
         stage('4. Healthcheck Applicatif') {
             steps {
                 // Validation que Nginx répond correctement dans le conteneur cible
-                sh 'ssh -o StrictHostKeyChecking=no deploy@localhost -p 2223 "sudo docker exec my-web-app-container curl -i http://localhost:80"'
-            }
+                  sh 'sshpass -p "password123" ssh -o StrictHostKeyChecking=no deploy@target-server -p 2222 sudo docker exec my-web-app-container curl -i http://localhost:80'            }
         }
     }
 
