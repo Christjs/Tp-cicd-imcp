@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  # Notre Serveur Cible (Conteneur B)
+  target-server:
+    image: lscr.io/linuxserver/openssh-server:latest
+    container_name: target-server
+    hostname: target-server
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+      - SUDO_ACCESS=true
+      - PASSWORD_ACCESS=true
+      - USER_PASSWORD=password123
+      - USER_NAME=deploy
+    ports:
+      - "2223:2222"
+      - "8081:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped

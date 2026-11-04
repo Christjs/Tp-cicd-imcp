@@ -1,0 +1,40 @@
+---
+- name: Déploiement de l'application Web Nginx sur le serveur cible
+  hosts: target
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Installer Python3 et Docker sur le serveur cible
+      raw: apk add --no-cache python3 docker
+      changed_when: false
+
+    - name: Créer le répertoire de destination site
+      file:
+        path: /home/deploy/site
+        state: directory
+        owner: deploy
+        group: deploy
+        mode: '0755'
+
+    - name: Copier le fichier index.html
+      copy:
+        src: ../site/index.html
+        dest: /home/deploy/site/index.html
+        owner: deploy
+        group: deploy
+
+    - name: Copier le Dockerfile
+      copy:
+        src: ../Dockerfile
+        dest: /home/deploy/Dockerfile
+        owner: deploy
+        group: deploy
+
+    - name: Reconstruire l'image Docker
+      command: docker build --no-cache -t my-web-app /home/deploy/
+
+    - name: Supprimer tout ancien conteneur web
+      shell: docker rm -f my-web-app-container || true
+
+    - name: Lancer le conteneur Nginx rattaché au réseau hôte
+      command: docker run -d --name my-web-app-container --net=host my-web-app
